@@ -8,13 +8,11 @@
 #define BUTTON_LOAD		103
 #include <Windows.h>
 #include <windowsx.h>
-#include <CommCtrl.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
-
-#pragma comment (lib,"comctl32.lib")
+#include "resource.h"
 
 
 LPCTSTR strItem[] = {
@@ -84,14 +82,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CreateWindow(
 		TEXT("BUTTON"), TEXT("保存"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		WINDOW_SIZE_W - 85, WINDOW_SIZE_H - 90, 73, 25,
+		WINDOW_SIZE_W - 85, WINDOW_SIZE_H - 63, 73, 25,
 		hWnd, (HMENU)BUTTON_SAVE, hInstance, NULL
 	);
 
 	CreateWindow(
 		TEXT("BUTTON"), TEXT("読込"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		WINDOW_SIZE_W - 160, WINDOW_SIZE_H - 90, 75, 25,
+		WINDOW_SIZE_W - 160, WINDOW_SIZE_H - 63, 75, 25,
 		hWnd, (HMENU)BUTTON_LOAD, hInstance, NULL
 	);
 
@@ -133,7 +131,7 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		inputbox = CreateWindow(
 			TEXT("EDIT"), NULL,
 			WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | WS_BORDER | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_LEFT | ES_MULTILINE | ES_WANTRETURN,
-			0, 0, 640, 535, hWnd, (HMENU)1,
+			0, 0, 640, 560, hWnd, (HMENU)1,
 			((LPCREATESTRUCT)(lParam))->hInstance, NULL
 		);
 		//--------------------------------------------------------------------
@@ -159,53 +157,12 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		ComboBox_SetCurSel(facebox, 0);
 		//--------------------------------------------------------------------
-		InitCommonControls();
-		statusbar = CreateStatusWindow(
-			WS_CHILD | WS_VISIBLE | CCS_BOTTOM,
-			TEXT("合計0文字  0行"), hWnd, 1);
-
-		//--------------------------------------------------------------------
 		return 0;
 		//-----------------
 	case WM_COMMAND:
-		switch (HIWORD(wParam))
-		{
-		case EN_CHANGE: {
-			char tmpstr[2048];
-			Edit_GetText(inputbox, tmpstr, 2048);
-			int linecount = Edit_GetLineCount(inputbox);
-
-
-			setlocale(LC_CTYPE, "");
-
-			int i = 0, textsum = 0, tmpc = 0;
-			while (tmpstr[i] != '\0')
-			{
-				tmpc = mblen(&tmpstr[i], MB_CUR_MAX);
-				if (tmpc == -1 || tmpstr[i] == '\r' || tmpstr[i] == '\n') {
-					textsum += 0;
-				}
-				else if (tmpc == 2) {
-					textsum += 1;
-				}
-				else {
-					textsum += 1;
-				}
-				i++;
-			}
-
-			sprintf_s(tmpstr, "合計%d文字　%d行", textsum, linecount);
-
-			SendMessage(statusbar, SB_SETTEXT, 255, (LPARAM)&tmpstr);
-
-			break;
-		}
-		}
-
 		switch (LOWORD(wParam))
 		{
 		case BUTTON_CHARA: {
-			//index = ComboBox_GetCurSel(charabox);
 			ComboBox_GetText(charabox, chtmp, 256);
 
 			strtmp = chtmp;
@@ -219,7 +176,6 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 		case BUTTON_CHARA_EX: {
-			//index = ComboBox_GetCurSel(facebox);
 			ComboBox_GetText(facebox, chtmp, 256);
 
 			strtmp = chtmp;

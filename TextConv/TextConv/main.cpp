@@ -6,6 +6,7 @@
 #define BUTTON_CHARA_EX	101
 #define BUTTON_SAVE		102
 #define BUTTON_LOAD		103
+#define BUTTON_SEQ		104
 #include <Windows.h>
 #include <windowsx.h>
 #include <string>
@@ -27,6 +28,14 @@ LPCTSTR strFace[] = {
 	TEXT("怒る"),
 	TEXT("哀しい"),
 	TEXT("楽しい"),
+};
+
+LPCTSTR strSeq[] = {
+	TEXT("キャラ維持次ページ"),
+	TEXT("現会話キャラ移動左"),
+	TEXT("現会話キャラ移動右"),
+	TEXT("隠し文字開始"),
+	TEXT("隠し文字終了"),
 };
 
 //プロトタイプ
@@ -80,6 +89,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	);
 
 	CreateWindow(
+		TEXT("BUTTON"), TEXT("制御"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		WINDOW_SIZE_W - 160, 125, 160, 25,
+		hWnd, (HMENU)BUTTON_SEQ, hInstance, NULL
+	);
+
+	CreateWindow(
 		TEXT("BUTTON"), TEXT("保存"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		WINDOW_SIZE_W - 85, WINDOW_SIZE_H - 63, 73, 25,
@@ -106,7 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 //Windws イベント用関数
 LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static HWND charabox, facebox, inputbox, statusbar;
+	static HWND charabox, facebox,seqbox, inputbox, statusbar;
 	static OPENFILENAME ofn = { 0 };
 	static char szFilePath[MAX_PATH] = "";
 
@@ -157,6 +173,17 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		ComboBox_SetCurSel(facebox, 0);
 		//--------------------------------------------------------------------
+		seqbox = CreateWindow(
+			TEXT("COMBOBOX"), NULL,
+			WS_CHILD | WS_VISIBLE | CBS_DROPDOWN,
+			WINDOW_SIZE_W - 160, 100, 145, 300, hWnd, (HMENU)1,
+			((LPCREATESTRUCT)(lParam))->hInstance, NULL);
+
+		for (i = 0; i < 5; i++)
+			SendMessage(seqbox, CB_ADDSTRING, 0, (LPARAM)strSeq[i]);
+
+		ComboBox_SetCurSel(seqbox, 0);
+		//--------------------------------------------------------------------
 		return 0;
 		//-----------------
 	case WM_COMMAND:
@@ -166,7 +193,7 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ComboBox_GetText(charabox, chtmp, 256);
 
 			strtmp = chtmp;
-			strtmp.insert(0, "[");
+			strtmp.insert(0, "[1_");
 			strtmp += "]\r\n";
 			strncpy_s(chtmp, strtmp.c_str(), 64);
 
@@ -179,8 +206,21 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ComboBox_GetText(facebox, chtmp, 256);
 
 			strtmp = chtmp;
-			strtmp.insert(0, "[");
+			strtmp.insert(0, "[2_");
 			strtmp += "]\r\n";
+			strncpy_s(chtmp, strtmp.c_str(), 64);
+
+			len = Edit_GetTextLength(inputbox);
+			Edit_SetSel(inputbox, len, len);
+			Edit_ReplaceSel(inputbox, chtmp);
+			break;
+		}
+		case BUTTON_SEQ: {
+			ComboBox_GetText(seqbox, chtmp, 256);
+
+			strtmp = chtmp;
+			strtmp.insert(0, "{");
+			strtmp += "}\r\n";
 			strncpy_s(chtmp, strtmp.c_str(), 64);
 
 			len = Edit_GetTextLength(inputbox);

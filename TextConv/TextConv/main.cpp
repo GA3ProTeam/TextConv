@@ -36,6 +36,8 @@ LPCTSTR strSeq[] = {
 	TEXT("現会話キャラ移動右"),
 	TEXT("隠し文字開始"),
 	TEXT("隠し文字終了"),
+	TEXT("フォント変更_標準"),
+	TEXT("フォント変更_変更1"),
 };
 
 //プロトタイプ
@@ -122,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 //Windws イベント用関数
 LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static HWND charabox, facebox,seqbox, inputbox, statusbar;
+	static HWND charabox, facebox, seqbox, inputbox, statusbar;
 	static OPENFILENAME ofn = { 0 };
 	static char szFilePath[MAX_PATH] = "";
 
@@ -179,7 +181,7 @@ LRESULT  CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			WINDOW_SIZE_W - 160, 100, 145, 300, hWnd, (HMENU)1,
 			((LPCREATESTRUCT)(lParam))->hInstance, NULL);
 
-		for (i = 0; i < 5; i++)
+		for (i = 0; i < 7; i++)
 			SendMessage(seqbox, CB_ADDSTRING, 0, (LPARAM)strSeq[i]);
 
 		ComboBox_SetCurSel(seqbox, 0);
